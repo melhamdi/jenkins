@@ -8,6 +8,8 @@ pipeline {
         stage ('Build') {
             steps {
                 echo 'Hello MAHER'
+		echo $TAG
+		echo $DATE
             }
         }
         stage('Docker Build') {
