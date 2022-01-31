@@ -1,34 +1,41 @@
-pipeline {
-    agent any
-    stages {
-        stage ('Build') {
-            steps {
-                echo 'Hello MAHER'
-            }
-        }
-        stage('Docker Build') {
-            steps {
-                script {
-                    docker.build("vigneshsweekaran/hello-world:maher")
-                }
-            }
-        }
-	    stage('Pushing Docker Image to Dockerhub') {
-            steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker_credential') {
-                        docker.image("vigneshsweekaran/hello-world:maher").push()
-                        docker.image("vigneshsweekaran/hello-world:maher").push("latest")
-                    }
-                }
-            }
-        }
-        stage('Deploy'){
-            steps {
-                sh "docker stop hello-world | true"
-                sh "docker rm hello-world | true"
-                sh "docker run --name hello-world -d -p 9004:8080 vigneshsweekaran/hello-world:maher"
-            }
-        }
-    }
+pipeline { 
+
+  environment { 
+      registry = "melhamdi/rep01" 
+      registryCredential = 'dockerhub_id' 
+      dockerImage = '' 
+  }
+
+  agent any 
+  stages { 
+      stage('Cloning our Git') { 
+          steps { 
+              git 'https://github.com/YourGithubAccount/YourGithubRepository.git' 
+          }
+      } 
+	  
+      stage('Building our image') { 
+          steps { 
+              script { 
+                  dockerImage = docker.build registry + ":$BUILD_NUMBER" 
+              }
+          } 
+      }
+
+      stage('Deploy our image') { 
+          steps { 
+              script { 
+                  docker.withRegistry( '', registryCredential ) { 
+                      dockerImage.push() 
+                  }
+              } 
+          }
+      } 
+
+      stage('Cleaning up') { 
+          steps { 
+              sh "docker rmi $registry:$BUILD_NUMBER" 
+          }
+      } 
+  }
 }
