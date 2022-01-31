@@ -1,21 +1,15 @@
 pipeline {
     agent any
-    environment {
-        DATE = new Date().format('yy.M')
-        TAG = "${DATE}.${BUILD_NUMBER}"
-    }
     stages {
         stage ('Build') {
             steps {
                 echo 'Hello MAHER'
-		echo $TAG
-		echo $DATE
             }
         }
         stage('Docker Build') {
             steps {
                 script {
-                    docker.build("vigneshsweekaran/hello-world:${TAG}")
+                    docker.build("vigneshsweekaran/hello-world:maher")
                 }
             }
         }
@@ -23,8 +17,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'docker_credential') {
-                        docker.image("vigneshsweekaran/hello-world:${TAG}").push()
-                        docker.image("vigneshsweekaran/hello-world:${TAG}").push("latest")
+                        docker.image("vigneshsweekaran/hello-world:maher").push()
+                        docker.image("vigneshsweekaran/hello-world:maher").push("latest")
                     }
                 }
             }
@@ -33,7 +27,7 @@ pipeline {
             steps {
                 sh "docker stop hello-world | true"
                 sh "docker rm hello-world | true"
-                sh "docker run --name hello-world -d -p 9004:8080 vigneshsweekaran/hello-world:${TAG}"
+                sh "docker run --name hello-world -d -p 9004:8080 vigneshsweekaran/hello-world:maher"
             }
         }
     }
