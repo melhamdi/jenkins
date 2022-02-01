@@ -26,7 +26,7 @@ pipeline {
           steps { 
               script { 
                  // docker.withRegistry( '', registryCredential )
-		      withDockerRegistry([ credentialsId: "registryCredential", url: "https://registry.hub.docker.com" ]){ 
+		      withDockerRegistry('https://registry.hub.docker.com', 'dockerhub_id'){ 
                       dockerImage.push() 
                   }
               } 
