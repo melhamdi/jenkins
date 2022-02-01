@@ -26,17 +26,17 @@ pipeline {
           steps { 
               script { 
                  // docker.withRegistry( '', registryCredential )
-		      docker.withRegistry( 'https://registry.hub.docker.com', 'registryCredential' ){ 
+		      docker.withRegistry( 'https://registry.hub.docker.com', 'dockerhub_id' ){ 
                       dockerImage.push() 
                   }
               } 
           }
       } 
 
-//      stage('Cleaning up') { 
-//          steps { 
-//              sh "docker rmi $registry:$BUILD_NUMBER" 
-//          }
-//      } 
+      stage('Cleaning up') { 
+          steps { 
+              sh "docker rmi $registry:$BUILD_NUMBER" 
+         }
+      } 
   }
 }
